@@ -23,7 +23,7 @@ public class ZipUtil {
 
       while (zipEntry != null) {
         String name = zipEntry.getName();
-        File newFile = new File(destinationDir.getParentFile(), toTargetName(name));
+        File newFile = new File(destinationDir, name);
         if (zipEntry.isDirectory()) {
           if (!newFile.isDirectory() && !newFile.mkdirs()) {
             throw new IOException("Failed to create directory " + newFile);
@@ -54,15 +54,5 @@ public class ZipUtil {
       return false;
     }
     return true;
-  }
-
-
-
-  @NonNull
-  private static String toTargetName(String name) {
-    while (name.contains("/")) {
-      name = name.substring(name.indexOf("/") + 1);
-    }
-    return name;
   }
 }
