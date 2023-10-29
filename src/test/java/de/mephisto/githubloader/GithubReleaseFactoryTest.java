@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GithubReleaseFactoryTest {
   private final static Logger LOG = LoggerFactory.getLogger(GithubReleaseFactoryTest.class);
@@ -20,7 +21,7 @@ public class GithubReleaseFactoryTest {
     assertNotNull(githubRelease);
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
-    artifact.install(new File("./"));
+    assertTrue(artifact.install(new File("./test/")));
   }
 
 

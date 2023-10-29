@@ -24,8 +24,9 @@ public class ReleaseArtifact {
     this.name = name;
   }
 
-  public void install(@NonNull File targetFolder) throws Exception {
+  public boolean install(@NonNull File targetFolder) throws Exception {
     File archive = DownloadUtil.download(this.getUrl(), targetFolder);
-
+    ZipUtil.unzip(archive, targetFolder);
+    return archive.delete();
   }
 }
