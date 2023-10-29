@@ -26,14 +26,20 @@ public class GithubReleaseFactoryTest {
 
 
   @Test
-  public void testVpx() throws IOException {
+  public void testVpx() throws Exception {
     GithubRelease githubRelease = GithubReleaseFactory.loadRelease("https://github.com/vpinball/vpinball/releases", Collections.emptyList(), Arrays.asList("Debug"));
     assertNotNull(githubRelease);
+
+    ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
+    assertTrue(artifact.install(new File("./test/")));
   }
 
   @Test
-  public void testBackglass() throws IOException {
+  public void testBackglass() throws Exception {
     GithubRelease githubRelease = GithubReleaseFactory.loadRelease("https://github.com/vpinball/b2s-backglass/releases", Collections.emptyList(), Arrays.asList("Source"));
     assertNotNull(githubRelease);
+
+    ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
+    assertTrue(artifact.install(new File("./test/")));
   }
 }
