@@ -1,6 +1,5 @@
 package de.mephisto.githubloader;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,13 +34,22 @@ public class ZipUtil {
           if (!parent.isDirectory() && !parent.mkdirs()) {
             throw new IOException("Failed to create directory " + parent);
           }
+          if (newFile.exists()) {
+            if (!newFile.delete()) {
+              LOG.error("Failed to delete file: " + newFile.getAbsolutePath());
+            }
+            LOG.info("Overwriting " + newFile.getAbsolutePath());
+          }
+          else {
+            LOG.info("Writing " + newFile.getAbsolutePath());
+          }
+
           FileOutputStream fos = new FileOutputStream(newFile);
           int len;
           while ((len = zis.read(buffer)) > 0) {
             fos.write(buffer, 0, len);
           }
           fos.close();
-          LOG.info("Written " + newFile.getAbsolutePath());
         }
         zis.closeEntry();
         zipEntry = zis.getNextEntry();
