@@ -81,4 +81,26 @@ public class GithubReleaseFactoryTest {
     assertNotNull(install);
     assertFalse(install.getLogs().isEmpty());
   }
+
+  @Test
+  public void testFlexDMD() throws Exception {
+    GithubRelease githubRelease = GithubReleaseFactory.loadRelease("https://github.com/vbousquet/flexdmd/releases", Collections.emptyList(), Arrays.asList("Source"));
+    assertNotNull(githubRelease);
+
+    ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
+    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), true, Collections.emptyList());
+    assertNotNull(install);
+    assertFalse(install.getLogs().isEmpty());
+  }
+
+  @Test
+  public void testFreezy() throws Exception {
+    GithubRelease githubRelease = GithubReleaseFactory.loadRelease("https://github.com/freezy/dmd-extensions/releases", Collections.emptyList(), Arrays.asList("Source", ".msi"));
+    assertNotNull(githubRelease);
+
+    ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
+    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Arrays.asList("DmdDevice.log.config", "DmdDevice.ini", "dmdext.log.config"));
+    assertNotNull(install);
+    assertFalse(install.getLogs().isEmpty());
+  }
 }

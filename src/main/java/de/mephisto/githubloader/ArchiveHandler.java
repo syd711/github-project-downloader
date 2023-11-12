@@ -70,26 +70,26 @@ public class ArchiveHandler {
 
       while (zipEntry != null) {
         String name = zipEntry.getName();
-        if (skipRootFolder) {
+        if (skipRootFolder && name.contains("/")) {
           name = name.substring(name.indexOf("/"));
         }
 
         File newFile = new File(destinationDir, name);
 
-        if (zipEntry.isDirectory()) {
+        if (zipEntry.isDirectory() || name.endsWith("\\")) {
           checkDirectory(newFile);
         }
         else {
           // fix for Windows-created archives
           File parent = newFile.getParentFile();
-          if (!simulate && !parent.isDirectory() && !parent.mkdirs()) {
+          if (!simulate && !parent.exists() && !newFile.mkdirs()) {
             installLog.setStatus("Failed to create directory " + parent.getAbsolutePath());
             throw new IOException("Failed to create directory " + parent.getAbsolutePath());
           }
 
-          checkFile(zipEntry, zis, newFile);
-
-          unzipFile(newFile, zis, buffer);
+          if (checkFile(zipEntry, zis, newFile)) {
+            unzipFile(newFile, zis, buffer);
+          }
         }
         zis.closeEntry();
         zipEntry = zis.getNextEntry();
@@ -104,7 +104,7 @@ public class ArchiveHandler {
   }
 
   private void checkDirectory(File newFile) throws IOException {
-    if (!simulate && !newFile.isDirectory() && !newFile.mkdirs()) {
+    if (!simulate && !newFile.exists() && !newFile.mkdirs()) {
       installLog.setStatus("Failed to create directory " + newFile.getAbsolutePath());
       throw new IOException("Failed to create directory " + newFile.getAbsolutePath());
     }
@@ -116,9 +116,13 @@ public class ArchiveHandler {
     }
   }
 
-  private void checkFile(ZipEntry entry, ZipInputStream zis, File newFile) throws IOException {
+  private boolean checkFile(ZipEntry entry, ZipInputStream zis, File newFile) throws IOException {
     if (isExcluded(entry.getName())) {
-      installLog.log("Skipped excluded file " + entry.getName());
+      if ((!simulate && newFile.exists()) || diff) {
+        installLog.log("Skipped excluded file " + entry.getName());
+        installLog.addDiffEntry(newFile.getAbsolutePath(), DiffState.SKIPPED, -1, -1);
+      }
+      return false;
     }
 
     if (newFile.exists()) {
@@ -141,8 +145,14 @@ public class ArchiveHandler {
       }
     }
     else {
-      installLog.log("Writing " + newFile.getAbsolutePath());
-      LOG.debug("Writing " + newFile.getAbsolutePath());
+      if (simulate) {
+        installLog.log("Simulating write of " + newFile.getAbsolutePath());
+        LOG.debug("Simulating writing of " + newFile.getAbsolutePath());
+      }
+      else {
+        installLog.log("Writing " + newFile.getAbsolutePath());
+        LOG.debug("Writing " + newFile.getAbsolutePath());
+      }
     }
 
 
@@ -171,6 +181,8 @@ public class ArchiveHandler {
         installLog.addDiffEntry(newFile.getAbsolutePath(), DiffState.TARGET_FILE_NOT_EXIST, -1, -1);
       }
     }
+
+    return true;
   }
 
   private boolean isExcluded(String name) {

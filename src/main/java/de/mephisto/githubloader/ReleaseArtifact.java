@@ -66,6 +66,7 @@ public class ReleaseArtifact {
       LOG.info(installLog.toLogString());
       return installLog;
     } catch (Exception e) {
+      LOG.error("Failed to run diff: " + e.getMessage(), e);
       installLog.setStatus(e.getMessage());
     }
     return installLog;
@@ -108,6 +109,7 @@ public class ReleaseArtifact {
 
       return installLog;
     } catch (Exception e) {
+      LOG.error("Failed to run install (simulated= " + simulate + "): " + e.getMessage(), e);
       installLog.setStatus(e.getMessage());
     }
     return installLog;
