@@ -16,9 +16,11 @@ public class GithubReleaseFactory {
   private final static Logger LOG = LoggerFactory.getLogger(GithubReleaseFactory.class);
 
   public static GithubRelease loadRelease(@NonNull String url, @NonNull List<String> allowList, @NonNull List<String> ignoreList) throws IOException {
+    long start = System.currentTimeMillis();
     GithubRelease githubRelease = readFirstRelease(url);
     if (githubRelease != null) {
       loadArtifacts(url, allowList, ignoreList, githubRelease);
+      LOG.info("Loaded release info for " + url + ", took " + (System.currentTimeMillis()-start) + "ms.");
       return githubRelease;
     }
     return null;
@@ -31,7 +33,6 @@ public class GithubReleaseFactory {
       }
       String url = baseUrl + "expanded_assets/" + githubRelease.getTag();
 
-      LOG.info("Loading release artifactors for " + url);
       Document doc = Jsoup
         .connect(url)
         .userAgent("Mozilla")
@@ -41,13 +42,13 @@ public class GithubReleaseFactory {
         String artifactUrl = "https://github.com" + e.attr("href");
         if (artifactUrl.contains("releases/download")) {
 
-          ReleaseArtifact artifact = new ReleaseArtifact();
+          ReleaseArtifact artifact = new ReleaseArtifact(githubRelease);
           artifact.setName(e.text());
           artifact.setUrl(artifactUrl);
 
           if (patternList.isEmpty() && ignoreList.isEmpty()) {
             githubRelease.getArtifacts().add(artifact);
-            LOG.info("Added release artifact: " + e.text() + " (" + artifactUrl + ")");
+            LOG.debug("Added release artifact: " + e.text() + " (" + artifactUrl + ")");
           }
           else {
             for (String s : patternList) {
@@ -64,7 +65,7 @@ public class GithubReleaseFactory {
           }
 
           githubRelease.getArtifacts().add(artifact);
-          LOG.info("Added release artifact: " + e.text() + " (" + artifactUrl + ")");
+          LOG.debug("Added release artifact: " + e.text() + " (" + artifactUrl + ")");
         }
       });
 
@@ -92,7 +93,7 @@ public class GithubReleaseFactory {
 
       Set<Map.Entry<String, String>> entries = tag2Url.entrySet();
       for (Map.Entry<String, String> entry : entries) {
-        LOG.info("Resolved release entry: " + entry + " (" + entry.getValue() + ")");
+        LOG.debug("Resolved release entry: " + entry + " (" + entry.getValue() + ")");
       }
 
       if (!entries.isEmpty()) {
@@ -102,6 +103,7 @@ public class GithubReleaseFactory {
 
         GithubRelease release = new GithubRelease();
         release.setName(next.getKey());
+        release.setReleasesUrl(url);
         release.setUrl(next.getValue());
         release.setTag(split[split.length-1]);
         return release;

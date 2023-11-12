@@ -8,8 +8,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GithubReleaseFactoryTest {
   private final static Logger LOG = LoggerFactory.getLogger(GithubReleaseFactoryTest.class);
@@ -20,7 +19,33 @@ public class GithubReleaseFactoryTest {
     assertNotNull(githubRelease);
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
-    assertTrue(artifact.install(new File("./test/")));
+    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Collections.emptyList());
+    assertNotNull(install);
+    assertFalse(install.getLogs().isEmpty());
+  }
+
+  @Test
+  public void testMameDownloadSimulated() throws Exception {
+    GithubRelease githubRelease = GithubReleaseFactory.loadRelease("https://github.com/vpinball/pinmame/releases", Arrays.asList("win-", "VPinMAME"), Arrays.asList("linux", "sc-", "osx"));
+    assertNotNull(githubRelease);
+
+    ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
+    ReleaseArtifactActionLog install = artifact.simulateInstall(new File("./test/"), false, Collections.emptyList());
+    assertNotNull(install);
+    assertFalse(install.getLogs().isEmpty());
+  }
+
+  @Test
+  public void testMameDiff() throws Exception {
+    GithubRelease githubRelease = GithubReleaseFactory.loadRelease("https://github.com/vpinball/pinmame/releases", Arrays.asList("win-", "VPinMAME"), Arrays.asList("linux", "sc-", "osx"));
+    assertNotNull(githubRelease);
+
+    ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
+    ReleaseArtifactActionLog install = artifact.diff(new File("./test/"), false, Collections.emptyList(), "*.dll");
+    assertNotNull(install);
+    assertFalse(install.getLogs().isEmpty());
+    assertFalse(install.getDiffEntries().isEmpty());
+    System.out.println(install.getSummary());
   }
 
 
@@ -30,7 +55,9 @@ public class GithubReleaseFactoryTest {
     assertNotNull(githubRelease);
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
-    assertTrue(artifact.install(new File("./test/")));
+    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Collections.emptyList());
+    assertNotNull(install);
+    assertFalse(install.getLogs().isEmpty());
   }
 
   @Test
@@ -39,6 +66,19 @@ public class GithubReleaseFactoryTest {
     assertNotNull(githubRelease);
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
-    assertTrue(artifact.install(new File("./test/")));
+    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Collections.emptyList());
+    assertNotNull(install);
+    assertFalse(install.getLogs().isEmpty());
+  }
+
+  @Test
+  public void testSerum() throws Exception {
+    GithubRelease githubRelease = GithubReleaseFactory.loadRelease("https://github.com/zesinger/libserum/releases", Collections.emptyList(), Arrays.asList("Source", "tvos", "macOS", "linux", "arm", "android"));
+    assertNotNull(githubRelease);
+
+    ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
+    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), true, Collections.emptyList());
+    assertNotNull(install);
+    assertFalse(install.getLogs().isEmpty());
   }
 }

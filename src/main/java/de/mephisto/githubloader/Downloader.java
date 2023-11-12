@@ -10,12 +10,24 @@ import java.io.FileOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class DownloadUtil {
+public class Downloader {
   private final static Logger LOG = LoggerFactory.getLogger(GithubReleaseFactory.class);
+  private final String downloadUrl;
+  private final File targetFolder;
+  private final ReleaseArtifactActionLog installLog;
+  private final boolean simulate;
+
+  Downloader(String downloadUrl, File targetFolder, ReleaseArtifactActionLog installLog, boolean simulate) {
+    this.downloadUrl = downloadUrl;
+    this.targetFolder = targetFolder;
+    this.installLog = installLog;
+    this.simulate = simulate;
+  }
 
   @NonNull
-  public static File download(String downloadUrl, File targetFolder) throws Exception {
+  public File download() throws Exception {
     if (targetFolder.isFile()) {
+      installLog.setStatus("targetFolder folder must be a folder, not a file");
       throw new UnsupportedOperationException("targetFolder folder must be a folder, not a file");
     }
 
@@ -23,9 +35,11 @@ public class DownloadUtil {
     String name = split[split.length - 1];
     File targetFile = new File(targetFolder, name);
     if (targetFile.exists() && !targetFile.delete()) {
+      installLog.setStatus("Failed to delete " + targetFile.getAbsolutePath());
       throw new UnsupportedOperationException("Failed to delete " + targetFile.getAbsolutePath());
     }
 
+    installLog.log("Downloading " + downloadUrl + " to " + targetFile.getAbsolutePath());
     LOG.info("Downloading " + downloadUrl + " to " + targetFile.getAbsolutePath());
     URL url = new URL(downloadUrl);
     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -55,9 +69,11 @@ public class DownloadUtil {
     }
 
     if (!tmp.renameTo(targetFile)) {
-      LOG.error("Failed to rename download temp file to " + targetFile.getAbsolutePath());
+      installLog.setStatus("Failed to rename download temp file to " + targetFile.getAbsolutePath());
+      throw new UnsupportedOperationException("Failed to rename download temp file to " + targetFile.getAbsolutePath());
     }
 
+    installLog.log("Downloaded file " + targetFile.getAbsolutePath());
     LOG.info("Downloaded file " + targetFile.getAbsolutePath());
     return targetFile;
   }
