@@ -57,10 +57,10 @@ public class ArchiveHandler {
   private void run(@NonNull File destinationDir) {
     try {
       if (simulate) {
-        installLog.log("Extracting \"" + archiveFile.getName() + "\" to \"" + destinationDir.getAbsolutePath() + "\"");
+        installLog.log("Simulating extraction of \"" + archiveFile.getName() + "\" to \"" + destinationDir.getAbsolutePath() + "\"");
       }
       else {
-        installLog.log("Simulating extraction of \"" + archiveFile.getName() + "\" to \"" + destinationDir.getAbsolutePath() + "\"");
+        installLog.log("Extracting \"" + archiveFile.getName() + "\" to \"" + destinationDir.getAbsolutePath() + "\"");
       }
 
       byte[] buffer = new byte[1024];
@@ -121,8 +121,8 @@ public class ArchiveHandler {
       if ((!simulate && newFile.exists()) || diff) {
         installLog.log("Skipped excluded file " + entry.getName());
         installLog.addDiffEntry(newFile.getAbsolutePath(), DiffState.SKIPPED, -1, -1);
+        return false;
       }
-      return false;
     }
 
     if (newFile.exists()) {

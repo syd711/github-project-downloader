@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -58,6 +59,24 @@ public class GithubReleaseFactoryTest {
     ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Collections.emptyList());
     assertNotNull(install);
     assertFalse(install.getLogs().isEmpty());
+  }
+
+
+  @Test
+  public void testVpxDiff() throws Exception {
+    GithubRelease githubRelease = GithubReleaseFactory.loadRelease("https://github.com/vpinball/vpinball/releases", Collections.emptyList(), Arrays.asList("Debug"));
+    assertNotNull(githubRelease);
+
+    ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
+    ReleaseArtifactActionLog install = artifact.diff(new File("./test/"), false, Collections.emptyList());
+    assertNotNull(install);
+    assertFalse(install.getDiffEntries().isEmpty());
+
+    List<DiffEntry> diffEntries = install.getDiffEntries();
+    for (DiffEntry diffEntry : diffEntries) {
+      System.out.println(diffEntry);
+    }
+
   }
 
   @Test

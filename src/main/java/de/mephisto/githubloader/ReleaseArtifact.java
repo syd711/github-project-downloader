@@ -1,6 +1,7 @@
 package de.mephisto.githubloader;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +41,17 @@ public class ReleaseArtifact {
   }
 
   public ReleaseArtifactActionLog diff(@NonNull File targetFolder, boolean skipRootFolder, @NonNull List<String> excludedFiles, @NonNull String... names) {
+    return diff(null, targetFolder, skipRootFolder, excludedFiles, names);
+  }
+
+  public ReleaseArtifactActionLog diff(@Nullable File sourceArchive, @NonNull File targetFolder, boolean skipRootFolder, @NonNull List<String> excludedFiles, @NonNull String... names) {
     ReleaseArtifactActionLog installLog = new ReleaseArtifactActionLog(this, false, true);
     try {
-      File archive = new Downloader(this.getUrl(), targetFolder, installLog, true).download();
+      File archive = sourceArchive;
+      if(archive == null || !archive.exists()) {
+        archive = new Downloader(this.getUrl(), targetFolder, installLog, true).download();
+      }
+
       if (!archive.exists()) {
         installLog.setStatus("Archive download failed for " + this + " failed, cancelling diff.");
         throw new UnsupportedOperationException("Archive download failed for " + this + " failed, cancelling diff.");
@@ -60,7 +69,7 @@ public class ReleaseArtifact {
         installLog.setSummary("The version tag \"" + githubRelease.getTag() + "\" of artifact \"" + this.name + "\" matches with the current installation.\nChecked files: " + String.join(", ", names));
       }
       else {
-        installLog.setSummary("The artifact \"" + this.name + "\" does not match with the current installation.\nChecked files: " + String.join(", ", names));
+        installLog.setSummary("The artifact \"" + this.name + "\" does not match with the current installation and is probably outdated.\nChecked files: " + String.join(", ", names));
       }
 
       LOG.info(installLog.toLogString());

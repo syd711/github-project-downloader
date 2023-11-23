@@ -119,7 +119,6 @@ public class ReleaseArtifactActionLog {
 
   public String toLogString() {
     StringBuilder builder = new StringBuilder();
-    builder.append("Log:\n==========================\n");
     logs.stream().forEach(l -> builder.append(l + "\n"));
 
     if (status != null) {
@@ -131,7 +130,6 @@ public class ReleaseArtifactActionLog {
 
   public String toDiffString() {
     StringBuilder builder = new StringBuilder();
-    builder.append("Installation Check Results:\n==========================\n");
     diffEntries.stream().forEach(l -> builder.append(l + "\n"));
     return builder.toString();
   }
