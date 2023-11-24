@@ -1,10 +1,8 @@
 package de.mephisto.githubloader;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.Transient;
 import java.io.File;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -14,7 +12,6 @@ import java.util.List;
 public class ReleaseArtifactActionLog {
   private final static Logger LOG = LoggerFactory.getLogger(ReleaseArtifactActionLog.class);
 
-  private final ReleaseArtifact releaseArtifact;
   private final List<String> logs = new ArrayList<>();
   private final List<DiffEntry> diffEntries = new ArrayList<>();
   private String status;
@@ -23,8 +20,7 @@ public class ReleaseArtifactActionLog {
   private boolean differing = false;
   private String summary;
 
-  public ReleaseArtifactActionLog(@NonNull ReleaseArtifact releaseArtifact, boolean simulate, boolean diff) {
-    this.releaseArtifact = releaseArtifact;
+  public ReleaseArtifactActionLog(boolean simulate, boolean diff) {
     this.simulated = simulate;
     this.diff = diff;
   }
@@ -92,11 +88,6 @@ public class ReleaseArtifactActionLog {
 
   public boolean isSimulated() {
     return simulated;
-  }
-
-  @Transient
-  public ReleaseArtifact getReleaseArtifact() {
-    return releaseArtifact;
   }
 
   public void log(String msg) {

@@ -1,7 +1,6 @@
 package de.mephisto.githubloader;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,30 +39,20 @@ public class ReleaseArtifact {
     return name;
   }
 
-  public ReleaseArtifactActionLog diff(@NonNull File targetFolder, boolean skipRootFolder, @NonNull List<String> excludedFiles, @NonNull String... names) {
-    return diff(null, targetFolder, skipRootFolder, excludedFiles, names);
-  }
-
-  public ReleaseArtifactActionLog diff(@Nullable File sourceArchive, @NonNull File targetFolder, boolean skipRootFolder, @NonNull List<String> excludedFiles, @NonNull String... names) {
-    ReleaseArtifactActionLog installLog = new ReleaseArtifactActionLog(this, false, true);
+  public ReleaseArtifactActionLog diff(@NonNull File sourceArchive, @NonNull File targetFolder, boolean skipRootFolder, @NonNull List<String> excludedFiles, @NonNull String... names) {
+    ReleaseArtifactActionLog installLog = new ReleaseArtifactActionLog(false, true);
     try {
-      File archive = sourceArchive;
-      if(archive == null || !archive.exists()) {
-        archive = new Downloader(this.getUrl(), targetFolder, installLog, true).download();
+      if (!sourceArchive.exists()) {
+        sourceArchive = new Downloader(this.getUrl(), installLog).download(sourceArchive);
       }
 
-      if (!archive.exists()) {
+      if (!sourceArchive.exists()) {
         installLog.setStatus("Archive download failed for " + this + " failed, cancelling diff.");
         throw new UnsupportedOperationException("Archive download failed for " + this + " failed, cancelling diff.");
       }
 
-      ArchiveHandler handler = new ArchiveHandler(archive, installLog, skipRootFolder, excludedFiles);
+      ArchiveHandler handler = new ArchiveHandler(sourceArchive, installLog, skipRootFolder, excludedFiles);
       handler.diff(targetFolder);
-
-      if (!archive.delete()) {
-        installLog.setStatus("Failed to delete download artifact \"" + archive.getAbsolutePath() + "\"");
-        throw new UnsupportedOperationException("Failed to delete download artifact \"" + archive.getAbsolutePath() + "\"");
-      }
 
       if (!installLog.hasDiffFor(names)) {
         installLog.setSummary("The version tag \"" + githubRelease.getTag() + "\" of artifact \"" + this.name + "\" matches with the current installation.\nChecked files: " + String.join(", ", names));
@@ -90,9 +79,9 @@ public class ReleaseArtifact {
   }
 
   private ReleaseArtifactActionLog install(@NonNull File targetFolder, boolean simulate, boolean skipRootFolder, List<String> excludedFiles) {
-    ReleaseArtifactActionLog installLog = new ReleaseArtifactActionLog(this, simulate, false);
+    ReleaseArtifactActionLog installLog = new ReleaseArtifactActionLog(simulate, false);
     try {
-      File archive = new Downloader(this.getUrl(), targetFolder, installLog, simulate).download();
+      File archive = new Downloader(this.getUrl(), installLog).download(null);
       if (!archive.exists()) {
         installLog.setStatus("Archive download failed for " + this + " failed, cancelling installation.");
         throw new UnsupportedOperationException("Archive download failed for " + this + " failed, cancelling installation.");

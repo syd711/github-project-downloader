@@ -7,12 +7,10 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GithubReleaseFactoryTest {
-  private final static Logger LOG = LoggerFactory.getLogger(GithubReleaseFactoryTest.class);
 
   @Test
   public void testMameDownload() throws Exception {
@@ -23,6 +21,7 @@ public class GithubReleaseFactoryTest {
     ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Collections.emptyList());
     assertNotNull(install);
     assertFalse(install.getLogs().isEmpty());
+    assertNull(install.getStatus());
   }
 
   @Test
@@ -34,6 +33,7 @@ public class GithubReleaseFactoryTest {
     ReleaseArtifactActionLog install = artifact.simulateInstall(new File("./test/"), false, Collections.emptyList());
     assertNotNull(install);
     assertFalse(install.getLogs().isEmpty());
+    assertNull(install.getStatus());
   }
 
   @Test
@@ -42,11 +42,11 @@ public class GithubReleaseFactoryTest {
     assertNotNull(githubRelease);
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
-    ReleaseArtifactActionLog install = artifact.diff(new File("./test/"), false, Collections.emptyList(), "*.dll");
+    ReleaseArtifactActionLog install = artifact.diff(new File("./test/", artifact.getName()), new File("./test/"), false, Collections.emptyList(), "*.dll");
     assertNotNull(install);
     assertFalse(install.getLogs().isEmpty());
     assertFalse(install.getDiffEntries().isEmpty());
-    System.out.println(install.getSummary());
+    assertNull(install.getStatus());
   }
 
 
@@ -58,6 +58,7 @@ public class GithubReleaseFactoryTest {
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
     ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Collections.emptyList());
     assertNotNull(install);
+    assertNull(install.getStatus());
     assertFalse(install.getLogs().isEmpty());
   }
 
@@ -68,14 +69,10 @@ public class GithubReleaseFactoryTest {
     assertNotNull(githubRelease);
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
-    ReleaseArtifactActionLog install = artifact.diff(new File("./test/"), false, Collections.emptyList());
+    ReleaseArtifactActionLog install = artifact.diff(new File("./test/", artifact.getName()), new File("./test/"), false, Collections.emptyList());
     assertNotNull(install);
+    assertNull(install.getStatus());
     assertFalse(install.getDiffEntries().isEmpty());
-
-    List<DiffEntry> diffEntries = install.getDiffEntries();
-    for (DiffEntry diffEntry : diffEntries) {
-      System.out.println(diffEntry);
-    }
 
   }
 
@@ -87,6 +84,7 @@ public class GithubReleaseFactoryTest {
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
     ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Collections.emptyList());
     assertNotNull(install);
+    assertNull(install.getStatus());
     assertFalse(install.getLogs().isEmpty());
   }
 
@@ -98,6 +96,7 @@ public class GithubReleaseFactoryTest {
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
     ReleaseArtifactActionLog install = artifact.install(new File("./test/"), true, Collections.emptyList());
     assertNotNull(install);
+    assertNull(install.getStatus());
     assertFalse(install.getLogs().isEmpty());
   }
 
@@ -109,6 +108,7 @@ public class GithubReleaseFactoryTest {
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
     ReleaseArtifactActionLog install = artifact.install(new File("./test/"), true, Collections.emptyList());
     assertNotNull(install);
+    assertNull(install.getStatus());
     assertFalse(install.getLogs().isEmpty());
   }
 
@@ -120,6 +120,7 @@ public class GithubReleaseFactoryTest {
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
     ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Arrays.asList("DmdDevice.log.config", "DmdDevice.ini", "dmdext.log.config"));
     assertNotNull(install);
+    assertNull(install.getStatus());
     assertFalse(install.getLogs().isEmpty());
   }
 }
