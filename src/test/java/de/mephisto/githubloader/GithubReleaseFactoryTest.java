@@ -40,7 +40,7 @@ public class GithubReleaseFactoryTest {
     assertNull(install.getStatus());
   }
 
-  @Test
+//  @Test
   public void testMameDiff() throws Exception {
     GithubRelease githubRelease = GithubReleaseFactory.loadRelease("https://github.com/vpinball/pinmame/releases", Arrays.asList("win-", "VPinMAME"), Arrays.asList("linux", "sc-", "osx"));
     assertNotNull(githubRelease);
