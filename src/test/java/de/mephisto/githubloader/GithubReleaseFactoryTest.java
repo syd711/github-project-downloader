@@ -1,8 +1,7 @@
 package de.mephisto.githubloader;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Arrays;
@@ -11,6 +10,11 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GithubReleaseFactoryTest {
+
+  @BeforeAll
+  public static void before() {
+    new File("./test/").mkdirs();
+  }
 
   @Test
   public void testMameDownload() throws Exception {
