@@ -71,6 +71,14 @@ public class GithubReleaseFactoryTest {
   @Test
   public void testVpx2() throws Exception {
     List<GithubRelease> githubReleases = GithubReleaseFactory.loadReleases("https://github.com/vpinball/vpinball/releases", Collections.emptyList(), Arrays.asList("Debug"));
+    for (GithubRelease githubRelease : githubReleases) {
+      List<ReleaseArtifact> artifacts = githubRelease.getArtifacts();
+      for (ReleaseArtifact artifact : artifacts) {
+        System.out.println(artifact);
+      }
+
+    }
+
     assertNotEquals(githubReleases, 1);
 
     ReleaseArtifact artifact = githubReleases.get(0).getArtifacts().get(0);
