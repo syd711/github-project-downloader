@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -60,6 +61,19 @@ public class GithubReleaseFactoryTest {
     assertNotNull(githubRelease);
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
+    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Collections.emptyList());
+    assertNotNull(install);
+    assertNull(install.getStatus());
+    assertFalse(install.getLogs().isEmpty());
+  }
+
+
+  @Test
+  public void testVpx2() throws Exception {
+    List<GithubRelease> githubReleases = GithubReleaseFactory.loadReleases("https://github.com/vpinball/vpinball/releases", Collections.emptyList(), Arrays.asList("Debug"));
+    assertNotEquals(githubReleases, 1);
+
+    ReleaseArtifact artifact = githubReleases.get(0).getArtifacts().get(0);
     ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Collections.emptyList());
     assertNotNull(install);
     assertNull(install.getStatus());

@@ -7,20 +7,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class GithubReleaseFactory {
   private final static Logger LOG = LoggerFactory.getLogger(GithubReleaseFactory.class);
 
+  public static List<GithubRelease> loadReleases(@NonNull String url, @NonNull List<String> allowList, @NonNull List<String> ignoreList) throws IOException {
+    long start = System.currentTimeMillis();
+    List<GithubRelease> githubReleases = readReleases(url, false);
+    for (GithubRelease githubRelease : githubReleases) {
+      loadArtifacts(url, allowList, ignoreList, githubRelease);
+      LOG.info("Loaded release info for " + url + ", took " + (System.currentTimeMillis() - start) + "ms.");
+    }
+    return githubReleases;
+  }
+
   public static GithubRelease loadRelease(@NonNull String url, @NonNull List<String> allowList, @NonNull List<String> ignoreList) throws IOException {
     long start = System.currentTimeMillis();
-    GithubRelease githubRelease = readFirstRelease(url);
-    if (githubRelease != null) {
+    List<GithubRelease> githubReleases = readReleases(url, true);
+    for (GithubRelease githubRelease : githubReleases) {
       loadArtifacts(url, allowList, ignoreList, githubRelease);
-      LOG.info("Loaded release info for " + url + ", took " + (System.currentTimeMillis()-start) + "ms.");
+      LOG.info("Loaded release info for " + url + ", took " + (System.currentTimeMillis() - start) + "ms.");
       return githubRelease;
     }
     return null;
@@ -78,7 +85,8 @@ public class GithubReleaseFactory {
     }
   }
 
-  private static GithubRelease readFirstRelease(String url) throws IOException {
+  private static List<GithubRelease> readReleases(String url, boolean latestOnly) throws IOException {
+    List<GithubRelease> result = new ArrayList<>();
     try {
       Document doc = Jsoup
         .connect(url)
@@ -97,16 +105,22 @@ public class GithubReleaseFactory {
       }
 
       if (!entries.isEmpty()) {
-        Map.Entry<String, String> next = entries.iterator().next();
+        Iterator<Map.Entry<String, String>> iterator = entries.iterator();
+        while (iterator.hasNext()) {
+          Map.Entry<String, String> next = iterator.next();
+          String[] split = next.getValue().split("/");
 
-        String[] split = next.getValue().split("/");
+          GithubRelease release = new GithubRelease();
+          release.setName(next.getKey());
+          release.setReleasesUrl(url);
+          release.setUrl(next.getValue());
+          release.setTag(split[split.length - 1]);
 
-        GithubRelease release = new GithubRelease();
-        release.setName(next.getKey());
-        release.setReleasesUrl(url);
-        release.setUrl(next.getValue());
-        release.setTag(split[split.length-1]);
-        return release;
+          result.add(release);
+          if (latestOnly) {
+            break;
+          }
+        }
       }
       else {
         LOG.info("No releases found for " + url);
@@ -115,6 +129,6 @@ public class GithubReleaseFactory {
       LOG.error("Failed to load release page: " + e.getMessage(), e);
       throw e;
     }
-    return null;
+    return result;
   }
 }
