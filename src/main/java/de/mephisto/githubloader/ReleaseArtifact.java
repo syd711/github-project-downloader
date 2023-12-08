@@ -55,10 +55,14 @@ public class ReleaseArtifact {
       handler.diff(targetFolder);
 
       if (!installLog.hasDiffFor(names)) {
-        installLog.setSummary("The version tag \"" + githubRelease.getTag() + "\" of artifact \"" + this.name + "\" matches with the current installation.\nThe following files have been checked for the version comparison: " + String.join(", ", names));
+        installLog.setSummary("********************* Summary *********************\n" +
+          "The version tag \"" + githubRelease.getTag() + "\" of artifact \"" + this.name + "\" matches with the current installation.\n" +
+          "The following files have been checked for the version comparison: " + String.join(", ", names));
       }
       else {
-        installLog.setSummary("The artifact \"" + this.name + "\" does not match with the current installation, your installation may be outdated.\nThe following files have been checked for the version comparison: " + String.join(", ", names));
+        installLog.setSummary("********************* Summary *********************\n" +
+          "The artifact \"" + this.name + "\" does not match with the current installation, your installation may be outdated.\n" +
+          "The following files have been checked for the version comparison: " + String.join(", ", names));
       }
 
       LOG.info(installLog.toLogString());
