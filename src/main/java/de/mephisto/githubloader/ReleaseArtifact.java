@@ -58,7 +58,7 @@ public class ReleaseArtifact {
         installLog.setSummary("The version tag \"" + githubRelease.getTag() + "\" of artifact \"" + this.name + "\" matches with the current installation.\nChecked files: " + String.join(", ", names));
       }
       else {
-        installLog.setSummary("The artifact \"" + this.name + "\" does not match with the current installation and is probably outdated.\nChecked files: " + String.join(", ", names));
+        installLog.setSummary("The artifact \"" + this.name + "\" does not match with the current installation, your installation may be outdated.\nChecked files: " + String.join(", ", names));
       }
 
       LOG.info(installLog.toLogString());
