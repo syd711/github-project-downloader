@@ -118,7 +118,7 @@ public class ArchiveHandler {
 
   private boolean checkFile(ZipEntry entry, ZipInputStream zis, File newFile) throws IOException {
     if (isExcluded(entry.getName())) {
-      if ((!simulate && newFile.exists()) || diff) {
+      if (simulate || newFile.exists() || diff) {
         installLog.log("Skipped excluded file " + entry.getName());
         installLog.addDiffEntry(newFile.getAbsolutePath(), DiffState.SKIPPED, -1, -1);
         return false;
