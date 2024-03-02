@@ -62,7 +62,7 @@ public class ReleaseArtifact {
         StringBuilder summary = new StringBuilder();
         summary.append("-------------------------------------------------------------------------------------\n");
         summary.append("SUCCESS\n");
-        summary.append("RESULT: ");
+        summary.append("RESULT:\n");
         summary.append("The version tag \"" + githubRelease.getTag() + "\" of artifact \"" + this.name + "\" matches with the current installation.\n");
         summary.append("The following files have been checked for the version comparison: " + String.join(", ", names) + "\n");
         summary.append("-------------------------------------------------------------------------------------\n");
@@ -75,7 +75,7 @@ public class ReleaseArtifact {
         StringBuilder summary = new StringBuilder();
         summary.append("-------------------------------------------------------------------------------------\n");
         summary.append("SUCCESS\n");
-        summary.append("RESULT: ");
+        summary.append("RESULT:\n");
         summary.append("The artifact \"" + this.name + "\" does not match with the current installation, your installation may be outdated.\n");
         summary.append("The following files have been checked for the version comparison: " + String.join(", ", names) + "\n");
         summary.append("-------------------------------------------------------------------------------------\n");
@@ -88,7 +88,17 @@ public class ReleaseArtifact {
       LOG.info(installLog.toLogString());
       return installLog;
     } catch (Exception e) {
-      LOG.error("Failed to run diff: " + e.getMessage(), e);
+      long duration = System.currentTimeMillis() - start;
+      StringBuilder summary = new StringBuilder();
+      summary.append("-------------------------------------------------------------------------------------\n");
+      summary.append("FAILED\n");
+      summary.append("RESULT:\n");
+      summary.append(e.getMessage());
+      summary.append("-------------------------------------------------------------------------------------\n");
+      summary.append("Total time:\t" + duration + "ms\n");
+      summary.append("Finished at:\t" + DateFormat.getDateTimeInstance().format(new Date()) + "\n");
+      summary.append("-------------------------------------------------------------------------------------\n");
+      installLog.setSummary(summary.toString());
       installLog.setStatus(e.getMessage());
     }
     return installLog;
