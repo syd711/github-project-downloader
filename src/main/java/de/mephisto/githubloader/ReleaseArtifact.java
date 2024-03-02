@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class ReleaseArtifact {
@@ -40,6 +42,7 @@ public class ReleaseArtifact {
   }
 
   public ReleaseArtifactActionLog diff(@NonNull File sourceArchive, @NonNull File targetFolder, boolean skipRootFolder, @NonNull List<String> excludedFiles, @NonNull String... names) {
+    long start = System.currentTimeMillis();
     ReleaseArtifactActionLog installLog = new ReleaseArtifactActionLog(false, true);
     try {
       if (!sourceArchive.exists()) {
@@ -53,16 +56,33 @@ public class ReleaseArtifact {
 
       ArchiveHandler handler = new ArchiveHandler(sourceArchive, installLog, skipRootFolder, excludedFiles);
       handler.diff(targetFolder);
+      long duration = System.currentTimeMillis() - start;
 
       if (!installLog.hasDiffFor(names)) {
-        installLog.setSummary("********************* Summary *********************\n" +
-          "The version tag \"" + githubRelease.getTag() + "\" of artifact \"" + this.name + "\" matches with the current installation.\n" +
-          "The following files have been checked for the version comparison: " + String.join(", ", names));
+        StringBuilder summary = new StringBuilder();
+        summary.append("-------------------------------------------------------------------------------------\n");
+        summary.append("SUCCESS\n");
+        summary.append("RESULT: ");
+        summary.append("The version tag \"" + githubRelease.getTag() + "\" of artifact \"" + this.name + "\" matches with the current installation.\n");
+        summary.append("The following files have been checked for the version comparison: " + String.join(", ", names) + "\n");
+        summary.append("-------------------------------------------------------------------------------------\n");
+        summary.append("Total time:\t" + duration + "ms\n");
+        summary.append("Finished at:\t" + DateFormat.getDateTimeInstance().format(new Date()) + "\n");
+        summary.append("-------------------------------------------------------------------------------------\n");
+        installLog.setSummary(summary.toString());
       }
       else {
-        installLog.setSummary("********************* Summary *********************\n" +
-          "The artifact \"" + this.name + "\" does not match with the current installation, your installation may be outdated.\n" +
-          "The following files have been checked for the version comparison: " + String.join(", ", names));
+        StringBuilder summary = new StringBuilder();
+        summary.append("-------------------------------------------------------------------------------------\n");
+        summary.append("SUCCESS\n");
+        summary.append("RESULT: ");
+        summary.append("The artifact \"" + this.name + "\" does not match with the current installation, your installation may be outdated.\n");
+        summary.append("The following files have been checked for the version comparison: " + String.join(", ", names) + "\n");
+        summary.append("-------------------------------------------------------------------------------------\n");
+        summary.append("Total time:\t" + duration + "ms\n");
+        summary.append("Finished at:\t" + DateFormat.getDateTimeInstance().format(new Date()) + "\n");
+        summary.append("-------------------------------------------------------------------------------------\n");
+        installLog.setSummary(summary.toString());
       }
 
       LOG.info(installLog.toLogString());

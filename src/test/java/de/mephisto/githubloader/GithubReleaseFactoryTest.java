@@ -60,6 +60,12 @@ public class GithubReleaseFactoryTest {
     GithubRelease githubRelease = GithubReleaseFactory.loadRelease("https://github.com/vpinball/vpinball/releases", Collections.emptyList(), Arrays.asList("Debug"));
     assertNotNull(githubRelease);
 
+    List<ReleaseArtifact> artifacts = githubRelease.getArtifacts();
+    for (ReleaseArtifact artifact : artifacts) {
+      System.out.println(artifact.getName());
+    }
+
+
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
     ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Collections.emptyList());
     assertNotNull(install);
