@@ -122,7 +122,7 @@ public class GithubReleaseFactoryTest {
 
   @Test
   public void testSerum() throws Exception {
-    GithubRelease githubRelease = GithubReleaseFactory.loadRelease("https://github.com/zesinger/libserum/releases", Collections.emptyList(), Arrays.asList("Source", "tvos", "macOS", "linux", "arm", "android"));
+    GithubRelease githubRelease = GithubReleaseFactory.loadRelease("https://github.com/zesinger/libserum/releases", Collections.emptyList(), Arrays.asList("Source", "tvos", "macOS", "macos", "linux", "arm", "android"));
     assertNotNull(githubRelease);
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);

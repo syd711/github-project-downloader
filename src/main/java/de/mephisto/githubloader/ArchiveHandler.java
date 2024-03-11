@@ -115,22 +115,21 @@ public class ArchiveHandler {
       while (zipEntry != null) {
         String name = zipEntry.getName();
         for (String rootFileIndicator : rootFileIndicators) {
-          if (name.equals(rootFileIndicator) && name.contains("/")) {
+          if (name.contains(rootFileIndicator) && name.contains("/")) {
             doSkip = true;
           }
         }
 
-
         zis.closeEntry();
         zipEntry = zis.getNextEntry();
+
+        if(doSkip) {
+          break;
+        }
       }
       fileInputStream.close();
       zis.closeEntry();
       zis.close();
-
-      if (doSkip) {
-        return doSkip;
-      }
     } catch (IOException e) {
       LOG.error("Error determining root folder skipping: " + e.getMessage(), e);
     }
