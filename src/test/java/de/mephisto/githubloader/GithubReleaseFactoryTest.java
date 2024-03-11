@@ -23,7 +23,7 @@ public class GithubReleaseFactoryTest {
     assertNotNull(githubRelease);
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
-    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Collections.emptyList());
+    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), Arrays.asList("VPMAlias.txt"), Collections.emptyList());
     assertNotNull(install);
     assertFalse(install.getLogs().isEmpty());
     assertNull(install.getStatus());
@@ -35,7 +35,7 @@ public class GithubReleaseFactoryTest {
     assertNotNull(githubRelease);
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
-    ReleaseArtifactActionLog install = artifact.simulateInstall(new File("./test/"), false, Collections.emptyList());
+    ReleaseArtifactActionLog install = artifact.simulateInstall(new File("./test/"), Arrays.asList("VPMAlias.txt"), Collections.emptyList());
     assertNotNull(install);
     assertFalse(install.getLogs().isEmpty());
     assertNull(install.getStatus());
@@ -47,7 +47,7 @@ public class GithubReleaseFactoryTest {
     assertNotNull(githubRelease);
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
-    ReleaseArtifactActionLog install = artifact.diff(new File("./test/", artifact.getName()), new File("./test/"), false, Collections.emptyList(), "*.dll");
+    ReleaseArtifactActionLog install = artifact.diff(new File("./test/", artifact.getName()), new File("./test/"), Arrays.asList("VPMAlias.txt"), Collections.emptyList(), "*.dll");
     assertNotNull(install);
     assertFalse(install.getLogs().isEmpty());
     assertFalse(install.getDiffEntries().isEmpty());
@@ -67,7 +67,7 @@ public class GithubReleaseFactoryTest {
 
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
-    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Collections.emptyList());
+    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), Arrays.asList("VPinballX64.exe", "VPinballX.exe", "VPinballX_GL.exe"), Collections.emptyList());
     assertNotNull(install);
     assertNull(install.getStatus());
     assertFalse(install.getLogs().isEmpty());
@@ -88,7 +88,7 @@ public class GithubReleaseFactoryTest {
     assertNotEquals(githubReleases, 1);
 
     ReleaseArtifact artifact = githubReleases.get(0).getArtifacts().get(0);
-    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Collections.emptyList());
+    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), Arrays.asList("VPinballX64.exe", "VPinballX.exe", "VPinballX_GL.exe"), Collections.emptyList());
     assertNotNull(install);
     assertNull(install.getStatus());
     assertFalse(install.getLogs().isEmpty());
@@ -101,7 +101,7 @@ public class GithubReleaseFactoryTest {
     assertNotNull(githubRelease);
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
-    ReleaseArtifactActionLog install = artifact.diff(new File("./test/", artifact.getName()), new File("./test/"), false, Collections.emptyList());
+    ReleaseArtifactActionLog install = artifact.diff(new File("./test/", artifact.getName()), new File("./test/"), Arrays.asList("VPinballX64.exe", "VPinballX.exe", "VPinballX_GL.exe"), Collections.emptyList());
     assertNotNull(install);
     assertNull(install.getStatus());
     assertFalse(install.getDiffEntries().isEmpty());
@@ -114,7 +114,7 @@ public class GithubReleaseFactoryTest {
     assertNotNull(githubRelease);
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
-    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Collections.emptyList());
+    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), Arrays.asList("README.txt"), Collections.emptyList());
     assertNotNull(install);
     assertNull(install.getStatus());
     assertFalse(install.getLogs().isEmpty());
@@ -126,7 +126,7 @@ public class GithubReleaseFactoryTest {
     assertNotNull(githubRelease);
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
-    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), true, Collections.emptyList());
+    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), Arrays.asList("serum64.dll", "serum.dll"), Collections.emptyList());
     assertNotNull(install);
     assertNull(install.getStatus());
     assertFalse(install.getLogs().isEmpty());
@@ -138,7 +138,7 @@ public class GithubReleaseFactoryTest {
     assertNotNull(githubRelease);
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
-    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), true, Collections.emptyList());
+    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), Arrays.asList("FlexDMDUI.exe"), Collections.emptyList());
     assertNotNull(install);
     assertNull(install.getStatus());
     assertFalse(install.getLogs().isEmpty());
@@ -150,7 +150,7 @@ public class GithubReleaseFactoryTest {
     assertNotNull(githubRelease);
 
     ReleaseArtifact artifact = githubRelease.getArtifacts().get(0);
-    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), false, Arrays.asList("DmdDevice.log.config", "DmdDevice.ini", "dmdext.log.config"));
+    ReleaseArtifactActionLog install = artifact.install(new File("./test/"), Arrays.asList("DmdDevice.ini"), Arrays.asList("DmdDevice.log.config", "DmdDevice.ini", "dmdext.log.config"));
     assertNotNull(install);
     assertNull(install.getStatus());
     assertFalse(install.getLogs().isEmpty());

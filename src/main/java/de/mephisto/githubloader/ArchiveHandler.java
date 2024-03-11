@@ -21,18 +21,18 @@ public class ArchiveHandler {
   @NonNull
   private final ReleaseArtifactActionLog installLog;
 
-  private final boolean skipRootFolder;
-
   @NonNull
   private final List<String> excludedFiles;
+
+  private List<String> rootFileIndicators;
 
   private boolean diff = false;
   private boolean simulate = false;
 
-  public ArchiveHandler(@NonNull File archiveFile, @NonNull ReleaseArtifactActionLog installLog, boolean skipRootFolder, @NonNull List<String> excludedFiles) {
+  public ArchiveHandler(@NonNull File archiveFile, @NonNull ReleaseArtifactActionLog installLog, @NonNull List<String> rootFileIndicators, @NonNull List<String> excludedFiles) {
     this.archiveFile = archiveFile;
     this.installLog = installLog;
-    this.skipRootFolder = skipRootFolder;
+    this.rootFileIndicators = rootFileIndicators;
     this.excludedFiles = excludedFiles;
   }
 
@@ -63,6 +63,8 @@ public class ArchiveHandler {
         installLog.log("Extracting \"" + archiveFile.getName() + "\" to \"" + destinationDir.getAbsolutePath() + "\"");
       }
 
+      boolean skipRoot = isRootSkipped();
+
       byte[] buffer = new byte[1024];
       FileInputStream fileInputStream = new FileInputStream(archiveFile);
       ZipInputStream zis = new ZipInputStream(fileInputStream);
@@ -70,7 +72,7 @@ public class ArchiveHandler {
 
       while (zipEntry != null) {
         String name = zipEntry.getName();
-        if (skipRootFolder && name.contains("/")) {
+        if (skipRoot && name.contains("/")) {
           name = name.substring(name.indexOf("/"));
         }
 
@@ -101,6 +103,38 @@ public class ArchiveHandler {
       installLog.setStatus("Unzipping of " + archiveFile.getAbsolutePath() + " failed: " + e.getMessage());
       throw new UnsupportedOperationException("Unzipping of " + archiveFile.getAbsolutePath() + " failed: " + e.getMessage(), e);
     }
+  }
+
+  private boolean isRootSkipped() {
+    boolean doSkip = false;
+    try {
+      FileInputStream fileInputStream = new FileInputStream(archiveFile);
+      ZipInputStream zis = new ZipInputStream(fileInputStream);
+      ZipEntry zipEntry = zis.getNextEntry();
+
+      while (zipEntry != null) {
+        String name = zipEntry.getName();
+        for (String rootFileIndicator : rootFileIndicators) {
+          if (name.equals(rootFileIndicator) && name.contains("/")) {
+            doSkip = true;
+          }
+        }
+
+
+        zis.closeEntry();
+        zipEntry = zis.getNextEntry();
+      }
+      fileInputStream.close();
+      zis.closeEntry();
+      zis.close();
+
+      if (doSkip) {
+        return doSkip;
+      }
+    } catch (IOException e) {
+      LOG.error("Error determining root folder skipping: " + e.getMessage(), e);
+    }
+    return doSkip;
   }
 
   private void checkDirectory(File newFile) throws IOException {
